@@ -27,7 +27,7 @@ local Window = Rayfield:CreateWindow({
         Subtitle = "Key System",
         Note = "The key is: gogodragon",
         FileName = "gogohubkey",
-        SaveKey = false,
+        SaveKey = true,
         GrabKeyFromSite = false,
         Key = {"gogodragon"}
     }
@@ -43,6 +43,7 @@ local RaidTab = Window:CreateTab("Raid", "skull")
 local ShopTab = Window:CreateTab("Shop", "shopping-cart")
 local DragonTab = Window:CreateTab("Dragon", "egg")
 local TeleportTab = Window:CreateTab("Teleport", "map-pin")
+local StatsTab = Window:CreateTab("Stats", "route")
 local MiscTab = Window:CreateTab("Misc", "user-cog")
 
 -- TabsSection
@@ -52,6 +53,7 @@ local TabSection = EspTab:CreateSection("ESP")
 local TabSection = FruitsTab:CreateSection("Frutas")
 local TabSection = SeaTab:CreateSection("Sea")
 local TabSection = PvpTab:CreateSection("PVP")
+local TabSection = StatsTab:CreateSection("Stats/Points")
 local TabSection = MiscTab:CreateSection("Misc")
 
 -- OTHER
@@ -1813,12 +1815,6 @@ FruitsTab:CreateToggle({
 -- Função para armazenar as frutas
 local function storeFruit(fruitName, fruitInstance)
     game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StoreFruit", fruitName, fruitInstance)
-    Rayfield:Notify({
-            Title = "Fruta guardada",
-            Content = "A fruta "..fruitName.." foi armazenada.",
-            Duration = 7,
-            Image = "apple",
-        })
 end
 
 -- Função para verificar e armazenar frutas
@@ -1935,35 +1931,6 @@ spawn(function()
 end)
 
 -- Sea
-
-local AutoW = SeaTab:CreateToggle({
-    Name = "Auto Press W",
-    CurrentValue = false,
-    Flag = "AutoW",
-    Callback = function(Value)
-        _G.AutoW = Value
-        if not Value then
-            game:GetService("VirtualInputManager"):SendKeyEvent(false, "W", false, game)
-        end
-    end
-})
-
-spawn(function()
-    while wait() do
-        pcall(function()
-            if _G.AutoW then
-                game:GetService("VirtualInputManager"):SendKeyEvent(true, "W", false, game)
-            end
-        end)
-    end
-end)
-
-game.Players.LocalPlayer.Character.HumanoidRootPart.Changed:Connect(function(property)
-    if property == "Position" and not _G.AutoW then
-        game:GetService("VirtualInputManager"):SendKeyEvent(false, "W", false, game)
-    end
-end)
-
 
 if World3 then
     local ToggleSeaBeAst = SeaTab:CreateToggle({
@@ -2334,6 +2301,62 @@ game:GetService("RunService").Heartbeat:Connect(function()
 end)
 
 -- PVP
+
+local Playerslist = {}
+for i, v in pairs(game:GetService("Players"):GetChildren()) do
+    table.insert(Playerslist, v.Name)
+end
+
+local SelectedPly = PvpTab:CreateDropdown({
+    Name = "Select Player",
+    CurrentOption = "nil",
+    Options = Playerslist,
+    Multi = false,
+    Callback = function(Value)
+        _G.SelectPly = Value
+    end
+})
+
+SelectedPly:Set("nil")
+
+PvpTab:CreateButton({
+    Name = "Refresh Player",
+    Callback = function()
+        table.clear(Playerslist)
+        for i, v in pairs(game:GetService("Players"):GetChildren()) do
+            table.insert(Playerslist, v.Name)
+        end
+        SelectedPly:Refresh(Playerslist) -- Atualiza as opções do dropdown
+    end
+})
+
+local ToggleTeleport = PvpTab:CreateToggle({
+    Name = "Teleport To Player",
+    CurrentValue = false,
+    Flag = "ToggleTeleport",
+    Callback = function(Value)
+        _G.TeleportPly = Value
+        if not Value then
+            wait()
+            toTarget(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame)
+            wait()
+        end
+    end
+})
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            if _G.TeleportPly then
+                if game.Players:FindFirstChild(_G.SelectPly) then
+                    toTarget(game.Players[_G.SelectPly].Character.HumanoidRootPart.CFrame)
+                end
+            end
+        end)
+    end
+end)
+
+local TabDivider = PvpTab:CreateSection("Combat")
 
 -- Função para encontrar o jogador mais próximo
 local function getClosestPlayer()
@@ -3120,12 +3143,145 @@ TeleportTab:CreateButton({
     end
 })
 
+-- Stats/Points
+
+local ToggleMelee = StatsTab:CreateToggle({
+    Name = "Auto Melee",
+    CurrentValue = false,
+    Flag = "ToggleMelee", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        _G.Auto_Stats_Melee = Value
+    end
+})
+
+local ToggleDefense = StatsTab:CreateToggle({
+    Name = "Auto Defense",
+    CurrentValue = false,
+    Flag = "ToggleDefense", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        _G.Auto_Stats_Defense = Value
+    end
+})
+
+local ToggleSword = StatsTab:CreateToggle({
+    Name = "Auto Sword",
+    CurrentValue = false,
+    Flag = "ToggleSword", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        _G.Auto_Stats_Sword = Value
+    end
+})
+
+local ToggleGun = StatsTab:CreateToggle({
+    Name = "Auto Gun",
+    CurrentValue = false,
+    Flag = "ToggleGun", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        _G.Auto_Stats_Gun = Value
+    end
+})
+
+local ToggleFruit = StatsTab:CreateToggle({
+    Name = "Auto Demon Fruit",
+    CurrentValue = false,
+    Flag = "ToggleFruit", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        _G.Auto_Stats_Devil_Fruit = Value
+    end
+})
+
+spawn(function()
+    while wait() do
+        if _G.Auto_Stats_Devil_Fruit then
+            local args = {
+                [1] = "AddPoint",
+                [2] = "Demon Fruit",
+                [3] = 3
+            }
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+        end
+    end
+end)
+
+spawn(function()
+    while wait() do
+        if _G.Auto_Stats_Gun then
+            local args = {
+                [1] = "AddPoint",
+                [2] = "Gun",
+                [3] = 3
+            }
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+        end
+    end
+end)
+
+spawn(function()
+    while wait() do
+        if _G.Auto_Stats_Sword then
+            local args = {
+                [1] = "AddPoint",
+                [2] = "Sword",
+                [3] = 3
+            }
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+        end
+    end
+end)
+
+spawn(function()
+    while wait() do
+        if _G.Auto_Stats_Defense then
+            local args = {
+                [1] = "AddPoint",
+                [2] = "Defense",
+                [3] = 3
+            }
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+        end
+    end
+end)
+
+spawn(function()
+    while wait() do
+        if _G.Auto_Stats_Melee then
+            local args = {
+                [1] = "AddPoint",
+                [2] = "Melee",
+                [3] = 3
+            }
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+        end
+    end
+end)
+
 -- Misc
 
 MiscTab:CreateParagraph({
     Title = "Estado da Lua",
     Content = "O estado para lua cheia é: Em desenvolvimento.",
 })
+
+local ToggleRemoveNotify = MiscTab:CreateToggle({
+    Name = "Enable or Remove All Notify",
+    CurrentValue = false,
+    Flag = "ToggleRemoveNotify", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(Value)
+        _G.RemoveNotify = Value
+    end
+})
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            if _G.RemoveNotify then
+                game.Players.LocalPlayer.PlayerGui.Notifications.Enabled = false
+            else
+                game.Players.LocalPlayer.PlayerGui.Notifications.Enabled = true
+            end
+        end)
+    end
+end)
 
 -- Botão para ativar/desativar o Auto Haki na aba Misc
 MiscTab:CreateToggle({

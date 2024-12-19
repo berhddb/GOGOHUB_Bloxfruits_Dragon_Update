@@ -1434,6 +1434,12 @@ function AttackNoCoolDown()
         end
     end
 
+local function AutoHaki()
+    if not game:GetService("Players").LocalPlayer.Character:FindFirstChild("HasBuso") then
+        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
+    end
+end
+
 --Attack Mastery
     function NormalAttack()
         if not _G.NormalAttack then
@@ -1662,16 +1668,22 @@ spawn(function()
 end)
 
 
+
+-- Toggle para ativar/desativar o Mob Aura
+SeaTab:CreateToggle({
+    Name = "Mob Aura",
+    CurrentValue = false,
+    Flag = "ToggleMobAura",
+    Callback = function(Value)
+        ToggleMobAura(Value)
+        if Value then
+            spawn(KillNearbyHumanoids)
+        end
+    end,
+})
+
 -- Variável para ativar/desativar o Auto Haki
 local autoHakiEnabled = false
-
--- Função para ativar o Buso Haki
-local function AutoHaki()
-    if not game:GetService("Players").LocalPlayer.Character:FindFirstChild("HasBuso") then
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
-    end
-end
-
 -- Função para verificar e ativar o Buso Haki continuamente se desativado
 local function checkHaki()
     while autoHakiEnabled do
@@ -1924,7 +1936,7 @@ end)
 
 -- Sea
 
-local TabSection = SeaTab:CreateSection("Kitsune")
+local TabSection = SeaTab:CreateSection("Mirage")
 
 -- Toggle do ESP na aba Mirage
 SeaTab:CreateToggle({
@@ -1942,6 +1954,129 @@ SeaTab:CreateToggle({
         updateAdvancedNPCESP()
     end
 })
+
+local SeaTab = Tabs.Main:CreateTab({Name = "SeaTab"})
+local AutoMysticIsland = SeaTab:AddSection("Mirage Island")
+
+SeaTab:CreateButton({
+    Name = "Tween to Mirage Island",
+    Callback = function()
+        TweenMirage()
+    end
+})
+
+function TweenMirage()
+    repeat
+        wait()
+    until game:GetService("Workspace").Map:FindFirstChild("MysticIsland")
+    if game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+        AllNPCS = getnilinstances()
+        for r, v in pairs(game:GetService("Workspace").NPCs:GetChildren()) do
+            table.insert(AllNPCS, v)
+        end
+        for r, v in pairs(AllNPCS) do
+            if v.Name == "Advanced Fruit Dealer" then
+                Tween2(v.HumanoidRootPart.CFrame)
+            end
+        end
+    end
+end
+
+SeaTab:CreateButton({
+    Name = "Tween to Highest Point",
+    Callback = function()
+        TwenetoHighestPoint()
+    end
+})
+
+function TwenetoHighestPoint()
+    HighestPoint = getHighestPoint()
+    if HighestPoint then
+        Tween2(HighestPoint.CFrame * CFrame.new(0, 211.88, 0))
+    end
+end
+
+function getHighestPoint()
+    if not game.workspace.Map:FindFirstChild("MysticIsland") then
+        return nil
+    end
+    for r, v in pairs(game:GetService("Workspace").Map.MysticIsland:GetDescendants()) do
+        if v:IsA("MeshPart") and v.MeshId == "rbxassetid://6745037796" then
+            return v
+        end
+    end
+    return nil
+end
+
+local ToggleTweenGear = SeaTab:CreateToggle({
+    Name = "Tween To Gear",
+    CurrentValue = false,
+    Flag = "ToggleTweenGear",
+    Callback = function(Value)
+        _G.TweenToGear = Value
+    end
+})
+Options.ToggleTweenGear:Set(false)
+
+spawn(function()
+    pcall(function()
+        while wait() do
+            if _G.TweenToGear then
+                if game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
+                    for i, v in pairs(game:GetService("Workspace").Map.MysticIsland:GetChildren()) do 
+                        if v:IsA("MeshPart") and v.Material == Enum.Material.Neon then  
+                            Tween2(v.CFrame)
+                        end
+                    end
+                end
+            end
+        end
+    end)
+end)
+
+local Togglelockmoon = SeaTab:CreateToggle({
+    Name = "Lock Moon and Use Race Skill",
+    CurrentValue = false,
+    Flag = "Togglelockmoon",
+    Callback = function(Value)
+        _G.AutoLockMoon = Value
+    end
+})
+Options.Togglelockmoon:Set(false)
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            if _G.AutoLockMoon then
+                local moonDir = game.Lighting:GetMoonDirection()
+                local lookAtPos = game.Workspace.CurrentCamera.CFrame.p + moonDir * 100
+                game.Workspace.CurrentCamera.CFrame = CFrame.lookAt(game.Workspace.CurrentCamera.CFrame.p, lookAtPos)
+            end
+        end)
+    end
+end)
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            if _G.AutoLockMoon then
+                game:GetService("VirtualInputManager"):SendKeyEvent(true, "T", false, game)
+                wait(0.1)
+                game:GetService("VirtualInputManager"):SendKeyEvent(false, "T", false, game)
+            end
+        end)
+    end
+end)
+
+local ToggleMirage = SeaTab:CreateToggle({
+    Name = "Auto Mirage Island",
+    CurrentValue = false,
+    Flag = "ToggleMirage",
+    Callback = function(Value)
+        _G.AutoSeaBeast = Value
+    end
+})
+Options.ToggleMirage:Set(false)
 
 -- Função para atualizar o ESP do Advanced Fruit Dealer
 local function updateAdvancedNPCESP()

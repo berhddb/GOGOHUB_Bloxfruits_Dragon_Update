@@ -2137,7 +2137,7 @@ SeaTab:CreateToggle({
 })
 
 SeaTab:CreateButton({
-    Name = "Tween to Mirage Island",
+    Name = "Tween to Mirage Island (In development)",
     Callback = function()
         TweenMirage()
     end

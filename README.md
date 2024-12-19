@@ -2013,7 +2013,6 @@ local ToggleTweenGear = SeaTab:CreateToggle({
         _G.TweenToGear = Value
     end
 })
-Options.ToggleTweenGear:Set(false)
 
 spawn(function()
     pcall(function()
@@ -2039,7 +2038,6 @@ local Togglelockmoon = SeaTab:CreateToggle({
         _G.AutoLockMoon = Value
     end
 })
-Options.Togglelockmoon:Set(false)
 
 spawn(function()
     while wait() do
@@ -2073,7 +2071,6 @@ local ToggleMirage = SeaTab:CreateToggle({
         _G.AutoSeaBeast = Value
     end
 })
-Options.ToggleMirage:Set(false)
 
 -- Função para atualizar o ESP do Advanced Fruit Dealer
 local function updateAdvancedNPCESP()

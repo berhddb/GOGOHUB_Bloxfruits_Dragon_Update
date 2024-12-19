@@ -2137,30 +2137,6 @@ SeaTab:CreateToggle({
 })
 
 SeaTab:CreateButton({
-    Name = "Tween to Mirage Island (In development)",
-    Callback = function()
-        TweenMirage()
-    end
-})
-
-function TweenMirage()
-    repeat
-        wait()
-    until game:GetService("Workspace").Map:FindFirstChild("MysticIsland")
-    if game:GetService("Workspace").Map:FindFirstChild("MysticIsland") then
-        AllNPCS = getnilinstances()
-        for r, v in pairs(game:GetService("Workspace").NPCs:GetChildren()) do
-            table.insert(AllNPCS, v)
-        end
-        for r, v in pairs(AllNPCS) do
-            if v.Name == "Advanced Fruit Dealer" then
-                Tween2(v.HumanoidRootPart.CFrame)
-            end
-        end
-    end
-end
-
-SeaTab:CreateButton({
     Name = "Tween to Highest Point",
     Callback = function()
         TwenetoHighestPoint()
@@ -2855,45 +2831,29 @@ end
 
 local Section = DragonTab:CreateSection("Pre-Historic Island")
 
-DragonTab:CreateButton({
-    Name = "Tween to Pre-Historic island (Broken)",
-    CurrentValue = false,
-    Flag = "GoToPrehistoricIsland",
-    Callback = function(Value)
-        _G.GoToPrehistoricIsland = Value
-            local PrehistoricIsland = game.Workspace.Map:FindFirstChild("PrehistoricIsland")
-            if PrehistoricIsland then
-                local TargetCFrame = game.Workspace.Map.PrehistoricIsland.Model.Model.Meshes["iceisland_Sphere_010"].CFrame
-                toTarget(TargetCFrame)
-                Rayfield:Notify({
-                    Title = "NOTIFICAÇÃO!",
-                    Content = "Indo para a ilha Pré-Historica",
-                    Duration = 6.5,
-                    Image = "check",
-                })
-            else
-                Rayfield:Notify({
-                    Title = "Erro",
-                    Content = "Nenhuma ilha Pré-Historica existe",
-                    Duration = 6.5,
-                    Image = "x",
-                })
-            end
-    end,
+local Toggle = DragonTab:CreateToggle({
+   Name = "Tween to Pre-Historic Island",
+   CurrentValue = false,
+   Flag = "GoToPrehistoricIsland", -- Assegure-se de usar um identificador único
+   Callback = function(Value)
+       _G.GoToPrehistoricIsland = Value
+       if Value then
+           local PrehistoricIsland = game.Workspace.Map:FindFirstChild("PrehistoricIsland")
+           if PrehistoricIsland then
+               local TargetCFrame = game.Workspace.Map.PrehistoricIsland.Model.Model.Meshes["iceisland_Sphere_010"].CFrame
+               toTarget(TargetCFrame)
+               Rayfield:Notify({
+                   Title = "NOTIFICAÇÃO!",
+                   Content = "Indo para a ilha Pré-Histórica",
+                   Duration = 6.5,
+                   Image = "check",
+               })
+           end
+       end
+   end,
 })
 
-function toTarget(cframe)
-    local player = game.Players.LocalPlayer
-    local character = player.Character
-    if character and character:FindFirstChild("HumanoidRootPart") then
-        game:GetService("TweenService"):Create(
-            character.HumanoidRootPart,
-            TweenInfo.new((character.HumanoidRootPart.Position - cframe.Position).Magnitude / 300, Enum.EasingStyle.Linear),
-            {CFrame = cframe}
-        ):Play()
-    end
-end
-
+Toggle:Set(false)
 -- Teleport
 
 local TabSection = TeleportTab:CreateSection("Sea Travel")

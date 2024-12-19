@@ -50,7 +50,7 @@ local TabSection = GeneralTab:CreateSection("Principal")
 GeneralTab:CreateParagraph({ Title = "GOGO Hub", Content = "Versão: 2.2 | Feito por berhddb"})
 local TabSection = EspTab:CreateSection("ESP")
 local TabSection = FruitsTab:CreateSection("Frutas")
-local TabSection = SeaTab:CreateSection("Kitsune")
+local TabSection = SeaTab:CreateSection("Sea")
 local TabSection = PvpTab:CreateSection("PVP")
 local TabSection = MiscTab:CreateSection("Misc")
 
@@ -1936,6 +1936,32 @@ end)
 
 -- Sea
 
+local AutoW = SeaTab:CreateToggle({
+    Name = "Auto Press W",
+    CurrentValue = false,
+    Flag = "AutoW",
+    Callback = function(Value)
+        _G.AutoW = Value
+        if not Value then
+            game:GetService("VirtualInputManager"):SendKeyEvent(false, "W", false, game)
+        end
+    end
+})
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            if _G.AutoW then
+                game:GetService("VirtualInputManager"):SendKeyEvent(true, "W", false, game)
+            else
+                game:GetService("VirtualInputManager"):SendKeyEvent(false, "W", false, game)
+            end
+        end)
+    end
+end)
+
+local TabSection = SeaTab:CreateSection("Kitsune")
+
 if World3 then
     -- Toggle para ESP da ilha Kitsune
     local ToggleEspKitsune = SeaTab:CreateToggle({
@@ -2157,26 +2183,6 @@ spawn(function()
         end)
     end
 end)
-
-local AutoW = SeaTab:CreateToggle({
-    Name = "Auto Press W",
-    CurrentValue = false,
-    Flag = "AutoW",
-    Callback = function(Value)
-        _G.AutoW = Value
-    end
-})
-
-spawn(function()
-    while wait() do
-        pcall(function()
-            if _G.AutoW then
-                game:GetService("VirtualInputManager"):SendKeyEvent(true, "W", false, game)
-            end
-        end)
-    end
-end)
-
 
 -- Função para atualizar o ESP do Advanced Fruit Dealer
 local function updateAdvancedNPCESP()

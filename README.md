@@ -1075,14 +1075,14 @@ QuestLv = 2
 NameMon = "Island Boy"
 CFrameQ = CFrame.new(-16549.890625, 55.68635559082031, -179.91360473632812)
 CFrameMon = CFrame.new(-16912.130859375, 11.787443161010742, -133.0850830078125)
-elseif Lv >= 2525 or SelectMonster == "Isle Champion" or SelectArea == 'Tiki Outpost' then
+elseif Lv == 2525 or Lv <= 2549 or SelectMonster == "Isle Champion" or SelectArea == 'Tiki Outpost' then
 Ms = "Isle Champion"
 NameQuest = "TikiQuest2"
 QuestLv = 2
 NameMon = "Isle Champion"
 CFrameQ = CFrame.new(-16542.447265625, 55.68632888793945, 1044.41650390625)
 CFrameMon = CFrame.new(-16848.94140625, 21.68633460998535, 1041.4490966796875)
-elseif Lv >= 2550 or SelectMonster == "Serpent Hunter" or SelectArea == 'Tiki Outpost' then
+elseif Lv == 2550 or Lv <= 2574 or SelectMonster == "Serpent Hunter" or SelectArea == 'Tiki Outpost' then
 Ms = "Serpent Hunter"
 NameQuest = "TikiQuest3"
 QuestLv = 1
@@ -1936,6 +1936,101 @@ end)
 
 -- Sea
 
+if World3 then
+    -- Toggle para ESP da ilha Kitsune
+    local ToggleEspKitsune = SeaTab:CreateToggle({
+        Name = "Esp Kitsune Island",
+        CurrentValue = false,
+        Flag = "ToggleEspKitsune",
+        Callback = function(Value)
+            espEnabled.kitsune = Value
+            if not Value then
+                for _, v in pairs(game:GetService("Workspace")["_WorldOrigin"].Locations:GetChildren()) do
+                    if v.Name == "Kitsune Island" then
+                        removeESP(v)
+                    end
+                end
+            end
+            updateKitsuneIslandESP()
+        end
+    })
+
+    -- Função para atualizar o ESP da ilha Kitsune
+    function updateKitsuneIslandESP()
+        for _, v in pairs(game:GetService("Workspace")["_WorldOrigin"].Locations:GetChildren()) do
+            pcall(function()
+                if espEnabled.kitsune then 
+                    if v.Name == "Kitsune Island" then
+                        local distance = math.floor((game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Position).Magnitude)
+                        createESP(v, Color3.fromRGB(80, 245, 245), v.Name .. " [" .. distance .. "m]")
+                    else
+                        removeESP(v)
+                    end
+                end
+            end)
+        end
+    end
+
+    -- Toggle para Tween até a ilha Kitsune
+    local ToggleTPKitsune = SeaTab:CreateToggle({
+        Name = "Tween To Kitsune Island",
+        CurrentValue = false,
+        Flag = "ToggleTPKitsune",
+        Callback = function(Value)
+            _G.TweenToKitsune = Value
+            if Value then
+                spawn(tweenToKitsuneIsland)
+            end
+        end
+    })
+
+    -- Função para Tween até a ilha Kitsune
+    function tweenToKitsuneIsland()
+        local kitsuneIsland
+        while not kitsuneIsland do
+            kitsuneIsland = game:GetService("Workspace").Map:FindFirstChild("KitsuneIsland")
+            wait(1)
+        end
+        while _G.TweenToKitsune do
+            local shrineActive = kitsuneIsland:FindFirstChild("ShrineActive")
+            if shrineActive then
+                for _, v in pairs(shrineActive:GetDescendants()) do
+                    if v:IsA("BasePart") and v.Name:find("NeonShrinePart") then
+                        Tween(v.CFrame)
+                    end
+                end
+            end
+            wait()
+        end
+    end
+
+    -- Toggle para coletar Azure Ambers
+    local ToggleCollectAzure = SeaTab:CreateToggle({
+        Name = "Collect Azure Ambers",
+        CurrentValue = false,
+        Flag = "ToggleCollectAzure",
+        Callback = function(Value)
+            _G.CollectAzure = Value
+            if Value then
+                spawn(collectAzureAmbers)
+            end
+        end
+    })
+
+    -- Função para coletar Azure Ambers
+    function collectAzureAmbers()
+        while _G.CollectAzure do
+            pcall(function()
+                if game:GetService("Workspace"):FindFirstChild("AttachedAzureEmber") then
+                    Tween(game:GetService("Workspace"):WaitForChild("EmberTemplate"):FindFirstChild("Part").CFrame)
+                    print("Azure")
+                end
+            end)
+            wait()
+        end
+    end
+end
+
 local TabSection = SeaTab:CreateSection("Mirage")
 
 -- Toggle do ESP na aba Mirage
@@ -2063,14 +2158,25 @@ spawn(function()
     end
 end)
 
-local ToggleMirage = SeaTab:CreateToggle({
-    Name = "Auto Mirage Island",
+local AutoW = SeaTab:CreateToggle({
+    Name = "Auto Press W",
     CurrentValue = false,
-    Flag = "ToggleMirage",
+    Flag = "AutoW",
     Callback = function(Value)
-        _G.AutoSeaBeast = Value
+        _G.AutoW = Value
     end
 })
+
+spawn(function()
+    while wait() do
+        pcall(function()
+            if _G.AutoW then
+                game:GetService("VirtualInputManager"):SendKeyEvent(true, "W", false, game)
+            end
+        end)
+    end
+end)
+
 
 -- Função para atualizar o ESP do Advanced Fruit Dealer
 local function updateAdvancedNPCESP()

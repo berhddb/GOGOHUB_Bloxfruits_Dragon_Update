@@ -50,7 +50,7 @@ local TabSection = GeneralTab:CreateSection("Principal")
 GeneralTab:CreateParagraph({ Title = "GOGO Hub", Content = "Versão: 2.2 | Feito por berhddb"})
 local TabSection = EspTab:CreateSection("ESP")
 local TabSection = FruitsTab:CreateSection("Frutas")
-local TabSection = KitsuneTab:CreateSection("Kitsune")
+local TabSection = SeaTab:CreateSection("Kitsune")
 local TabSection = PvpTab:CreateSection("PVP")
 local TabSection = MiscTab:CreateSection("Misc")
 
@@ -1923,8 +1923,11 @@ spawn(function()
 end)
 
 -- Sea
+
+local TabSection = SeaTab:CreateSection("Kitsune")
+
 -- Toggle do ESP na aba Mirage
-KitsuneTab:CreateToggle({
+SeaTab:CreateToggle({
     Name = "ESP Advanced NPC Dealer",
     CurrentValue = false,
     Flag = "espAdvancedNPC",

@@ -37,7 +37,7 @@ local Window = Rayfield:CreateWindow({
 local GeneralTab = Window:CreateTab("General", "laptop")
 local EspTab = Window:CreateTab("Esp", "eye")
 local FruitsTab = Window:CreateTab("Fruits", "apple")
-local MirageTab = Window:CreateTab("Mirage", "tree-palm")
+local SeaTab = Window:CreateTab("Sea", "waves")
 local PvpTab = Window:CreateTab("PVP", "swords")
 local RaidTab = Window:CreateTab("Raid", "skull")
 local ShopTab = Window:CreateTab("Shop", "shopping-cart")
@@ -50,7 +50,7 @@ local TabSection = GeneralTab:CreateSection("Principal")
 GeneralTab:CreateParagraph({ Title = "GOGO Hub", Content = "Versão: 2.2 | Feito por berhddb"})
 local TabSection = EspTab:CreateSection("ESP")
 local TabSection = FruitsTab:CreateSection("Frutas")
-local TabSection = MirageTab:CreateSection("ESP")
+local TabSection = KitsuneTab:CreateSection("Kitsune")
 local TabSection = PvpTab:CreateSection("PVP")
 local TabSection = MiscTab:CreateSection("Misc")
 
@@ -1600,7 +1600,7 @@ task.spawn(function()
 end)
 
 local ToggleLevel = GeneralTab:CreateToggle({
-    Name = "Auto Farm",
+    Name = "Auto Farm (Broken)",
     CurrentValue = false,
     Flag = "AutoLevel",
     Callback = function(Value)
@@ -1922,8 +1922,9 @@ spawn(function()
     end
 end)
 
+-- Sea
 -- Toggle do ESP na aba Mirage
-MirageTab:CreateToggle({
+KitsuneTab:CreateToggle({
     Name = "ESP Advanced NPC Dealer",
     CurrentValue = false,
     Flag = "espAdvancedNPC",
@@ -2188,6 +2189,7 @@ local ToggleKillAura = RaidTab:CreateToggle({
 spawn(function()
     while wait() do
         if KillAura then
+            if game.Players.LocalPlayer.PlayerGui.Main.TopHUDList.RaidTimer.Visible == true then
             pcall(function()
                 for i, v in pairs(game.Workspace.Enemies:GetDescendants()) do
                     if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
@@ -2199,6 +2201,7 @@ spawn(function()
                     end
                 end
             end)
+        end
         end
     end
 end)

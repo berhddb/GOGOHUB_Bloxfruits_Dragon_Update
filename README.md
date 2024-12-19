@@ -2309,15 +2309,15 @@ end
 
 local SelectedPly = PvpTab:CreateDropdown({
     Name = "Select Player",
-    CurrentOption = "nil",
     Options = Playerslist,
-    Multi = false,
-    Callback = function(Value)
-        _G.SelectPly = Value
+    CurrentOption = {"nil"},
+    MultipleOptions = false,
+    Flag = "SelectedPly", -- Identificador único para salvar configuração
+    Callback = function(Options)
+        _G.SelectPly = Options[1]
+        print("Selected player: " .. _G.SelectPly) -- Depuração
     end
 })
-
-SelectedPly:Set("nil")
 
 PvpTab:CreateButton({
     Name = "Refresh Player",
@@ -2326,7 +2326,7 @@ PvpTab:CreateButton({
         for i, v in pairs(game:GetService("Players"):GetChildren()) do
             table.insert(Playerslist, v.Name)
         end
-        SelectedPly:Refresh(Playerslist) -- Atualiza as opções do dropdown
+        SelectedPly:Set(Playerslist) -- Atualiza as opções do dropdown
     end
 })
 
@@ -2361,48 +2361,60 @@ spawn(function()
     end
 end)
 
+
 local TabDivider = PvpTab:CreateSection("Combat")
 
--- Função para encontrar o jogador mais próximo
-local function getClosestPlayer()
-    local closestPlayer = nil
-    local shortestDistance = math.huge -- Inicia com o valor mais alto possível
-
-    for _, player in pairs(game.Workspace.Characters:GetChildren()) do
-        if player:FindFirstChild("HumanoidRootPart") and player ~= game.Players.LocalPlayer.Character then
-            local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.HumanoidRootPart.Position).Magnitude
-            if distance < shortestDistance then
-                shortestDistance = distance
-                closestPlayer = player
-            end
-        end
-    end
-
-    return closestPlayer
+-- Cria uma lista com os jogadores
+local Playerslist = {}
+for i, v in pairs(game:GetService("Players"):GetChildren()) do
+    table.insert(Playerslist, v.Name)
 end
 
--- Variável para controlar o estado do aimbot
+-- Cria um dropdown para selecionar o jogador
+local SelectedPly = PvpTab:CreateDropdown({
+    Name = "Select Player",
+    Options = Playerslist,
+    CurrentOption = {"nil"},
+    MultipleOptions = false,
+    Flag = "SelectedPly", -- Identificador único para salvar configuração
+    Callback = function(Options)
+        _G.SelectPly = Options[1]
+        print("Selected player: " .. _G.SelectPly) -- Depuração
+    end
+})
+
+PvpTab:CreateButton({
+    Name = "Refresh Player",
+    Callback = function()
+        table.clear(Playerslist)
+        for i, v in pairs(game:GetService("Players"):GetChildren()) do
+            table.insert(Playerslist, v.Name)
+        end
+        SelectedPly:Set(Playerslist) -- Atualiza as opções do dropdown
+    end
+})
+
+-- Variáveis para controlar o estado do aimbot
 local aimbotEnabled = false
 local aimbotActive = false
 
 -- Função para ativar o Aimbot
 local function aimbot()
-    -- Verifica se o aimbot está ativado e ativo
     if aimbotEnabled and aimbotActive then
-        local closestPlayer = getClosestPlayer()
+        local selectedPlayer = game.Players:FindFirstChild(_G.SelectPly)
 
-        if closestPlayer and closestPlayer:FindFirstChild("HumanoidRootPart") then
-            -- Faz o mouse seguir o jogador mais próximo
+        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Faz o mouse seguir o jogador selecionado
             local player = game.Players.LocalPlayer
             local camera = game.Workspace.CurrentCamera
             local playerPos = player.Character.HumanoidRootPart.Position
-            local closestPos = closestPlayer.HumanoidRootPart.Position
+            local selectedPos = selectedPlayer.Character.HumanoidRootPart.Position
 
-            -- Calcula a direção entre o jogador e o alvo mais próximo
-            local direction = (closestPos - playerPos).unit
+            -- Calcula a direção entre o jogador e o alvo selecionado
+            local direction = (selectedPos - playerPos).unit
             local lookAtPos = playerPos + direction * 1000
 
-            -- Faz a câmera olhar para o alvo mais próximo
+            -- Faz a câmera olhar para o alvo selecionado
             camera.CFrame = CFrame.new(camera.CFrame.Position, lookAtPos)
         end
     end
@@ -2413,8 +2425,7 @@ PvpTab:CreateToggle({
     Name = "Aimbot",
     CurrentValue = false,
     Flag = "aimbot",
-    Callback = function
-    (Value)
+    Callback = function(Value)
         aimbotEnabled = Value
         if not aimbotEnabled then
             aimbotActive = false  -- Desativa o aimbot se o toggle for desligado
@@ -2441,6 +2452,7 @@ end)
 game:GetService("RunService").Heartbeat:Connect(function()
     aimbot() -- Chama a função de aimbot
 end)
+
 
 -- Raids
 local TabDivider = RaidTab:CreateSection("Select Chip")

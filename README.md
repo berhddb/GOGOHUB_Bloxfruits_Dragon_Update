@@ -2455,28 +2455,28 @@ end)
 
 
 -- Raids
+
 local TabDivider = RaidTab:CreateSection("Select Chip")
 
 local Chips = {"Flame", "Ice", "Quake", "Light", "Dark", "Spider", "Rumble", "Magma", "Buddha", "Sand", "Phoenix", "Dough"}
+local SelectChip = "nil"
 
--- Função para criar botões para cada chip
-for _, chip in ipairs(Chips) do
-    RaidTab:CreateButton({
-        Name = chip,
-        Callback = function()
-        if chip ~= SelectChip then
-            SelectChip = chip
-            Rayfield:Notify({
-                Title = "NOTIFICAÇÃO!",
-                Content = "Chip atual selecionado: "..chip,
-                Duration = 2,
-                Image = "cpu",
-            })
-        end
-        end,
-    })
-end
-local TabDivider = RaidTab:CreateDivider()
+local ChipDropdown = RaidTab:CreateDropdown({
+    Name = "Select Chip",
+    Options = Chips,
+    CurrentOption = {"nil"},
+    MultipleOptions = false,
+    Flag = "ChipDropdown",
+    Callback = function(Options)
+        SelectChip = Options[1]
+        Rayfield:Notify({
+            Title = "NOTIFICAÇÃO!",
+            Content = "Chip atual selecionado: " .. SelectChip,
+            Duration = 2,
+            Image = "cpu",
+        })
+    end,
+})
 
 -- Toggle para comprar o chip
 local ToggleBuy = RaidTab:CreateToggle({
@@ -2484,7 +2484,7 @@ local ToggleBuy = RaidTab:CreateToggle({
     CurrentValue = false,
     Flag = "ToggleBuy",
     Callback = function(Value)
-        if SelectChip then
+        if SelectChip ~= "nil" then
             _G.Auto_Buy_Chips_Dungeon = Value
         else
             Rayfield:Notify({
@@ -2498,60 +2498,22 @@ local ToggleBuy = RaidTab:CreateToggle({
 })
 
 spawn(function()
-    while wait(0.1) do
+    while wait() do
         pcall(function()
-            if _G.Autofruit then
-                local fruits = {
-                    "Rocket-Rocket", "Spin-Spin", "Blade-Blade", "Spring-Spring",
-                    "Bomb-Bomb", "Smoke-Smoke", "Spike-Spike", "Flame-Flame",
-                    "Falcon-Falcon", "Ice-Ice", "Sand-Sand", "Dark-Dark",
-                    "Ghost-Ghost", "Diamond-Diamond", "Light-Light", "Rubber-Rubber",
-                    "Barrier-Barrier"
+            if _G.Auto_Buy_Chips_Dungeon and SelectChip ~= "nil" then
+                local args = {
+                    [1] = "RaidsNpc",
+                    [2] = "Select",
+                    [3] = SelectChip
                 }
-
-                for _, fruit in ipairs(fruits) do
-                    local args = {
-                        [1] = "LoadFruit",
-                        [2] = fruit
-                    }
-                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
-                end
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
             end
         end)
     end
 end)
 
-spawn(function()
-    while wait() do
-        if _G.Auto_Buy_Chips_Dungeon and SelectChip then
-            pcall(function()
-                local args = {
-                    [1] = "RaidsNpc",
-                    [2] = "Select",
-                    [3] = SelectChip
-                }
-                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
-            end)
-        end
-    end
-end)
 
 local TabSection = RaidTab:CreateSection("Raid")
-
-spawn(function()
-    while wait() do
-        if _G.Auto_Buy_Chips_Dungeon then
-            pcall(function()
-                local args = {
-                    [1] = "RaidsNpc",
-                    [2] = "Select",
-                    [3] = SelectChip
-                }
-                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
-            end)
-        end
-    end
-end)
 
 -- Toggle para iniciar o raid
 local ToggleStart = RaidTab:CreateToggle({

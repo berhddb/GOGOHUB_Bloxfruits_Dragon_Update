@@ -2340,6 +2340,8 @@ local ToggleTeleport = PvpTab:CreateToggle({
             wait()
             toTarget(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame)
             wait()
+        else
+            print("Teleport enabled") -- Depuração
         end
     end
 })
@@ -2349,7 +2351,10 @@ spawn(function()
         pcall(function()
             if _G.TeleportPly then
                 if game.Players:FindFirstChild(_G.SelectPly) then
+                    print("Teleporting to: " .. _G.SelectPly) -- Depuração
                     toTarget(game.Players[_G.SelectPly].Character.HumanoidRootPart.CFrame)
+                else
+                    print("Player not found: " .. _G.SelectPly) -- Depuração
                 end
             end
         end)

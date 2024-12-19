@@ -2785,9 +2785,21 @@ MiscTab:CreateToggle({
     CurrentValue = false,
     Flag = "walkOnWater",
     Callback = function(Value)
-        walkOnWaterEnabled = Value
+        _G.WalkonWater = Value
     end    
 })
+
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            if _G.WalkonWater then
+                game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 112, 1000)
+            else
+                game:GetService("Workspace").Map["WaterBase-Plane"].Size = Vector3.new(1000, 80, 1000)
+            end
+        end)
+    end
+end)
 
 MiscTab:CreateButton({
     Name = "Redeem All Code",

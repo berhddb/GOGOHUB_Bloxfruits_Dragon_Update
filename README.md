@@ -3279,6 +3279,30 @@ MiscTab:CreateParagraph({
     Content = "O estado para lua cheia é: Em desenvolvimento.",
 })
 
+local ToggleNoClip = MiscTab:CreateToggle({
+    Name = "No Clip",
+    CurrentValue = false,
+    Flag = "ToggleNoClip", -- Identificador único para salvar configuração
+    Callback = function(Value)
+        _G.LOf = Value
+        print("No Clip: " .. tostring(Value)) -- Depuração
+    end
+})
+
+spawn(function()
+    pcall(function()
+        game:GetService("RunService").Stepped:Connect(function()
+            if _G.LOf then
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end)
+end)
+
 local ToggleRemoveNotify = MiscTab:CreateToggle({
     Name = "Enable or Remove All Notify",
     CurrentValue = false,

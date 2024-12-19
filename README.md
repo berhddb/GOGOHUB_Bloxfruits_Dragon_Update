@@ -1670,7 +1670,7 @@ end)
 
 
 -- Toggle para ativar/desativar o Mob Aura
-SeaTab:CreateToggle({
+GeneralTab:CreateToggle({
     Name = "Mob Aura",
     CurrentValue = false,
     Flag = "ToggleMobAura",

@@ -1955,9 +1955,6 @@ SeaTab:CreateToggle({
     end
 })
 
-local SeaTab = Tabs.Main:CreateTab({Name = "SeaTab"})
-local AutoMysticIsland = SeaTab:AddSection("Mirage Island")
-
 SeaTab:CreateButton({
     Name = "Tween to Mirage Island",
     Callback = function()

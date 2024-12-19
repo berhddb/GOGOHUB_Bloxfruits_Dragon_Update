@@ -1383,17 +1383,6 @@ end
 end
 end
 
-local plr = game.Players.LocalPlayer
-	local CbFw = getupvalues(require(plr.PlayerScripts.CombatFramework))
-	local CbFw2 = CbFw[2]
-
-    function GetCurrentBlade() 
-        local p13 = CbFw2.activeController
-        local ret = p13.blades[1]
-        if not ret then return end
-        while ret.Parent~=game.Players.LocalPlayer.Character do ret=ret.Parent end
-        return ret
-    end
 
 function AttackNoCoolDown()
         if not AutoFarmMasDevilFruit or AutoFarmMasGun then

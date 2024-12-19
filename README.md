@@ -1546,15 +1546,16 @@ task.spawn(function()
 end)
 
 
---select weapon
+-- Função para equipar a arma
 function EquipTool(ToolSe)
-		if game.Players.LocalPlayer.Backpack:FindFirstChild(ToolSe) then
-			local tool = game.Players.LocalPlayer.Backpack:FindFirstChild(ToolSe)
-			wait(0.5)
-			game.Players.LocalPlayer.Character.Humanoid:EquipTool(tool)
-		end
+    if game.Players.LocalPlayer.Backpack:FindFirstChild(ToolSe) then
+        local tool = game.Players.LocalPlayer.Backpack:FindFirstChild(ToolSe)
+        wait(0.5)
+        game.Players.LocalPlayer.Character.Humanoid:EquipTool(tool)
+    end
 end
 
+-- Dropdown para selecionar arma
 local DropdownSelectWeapon = GeneralTab:CreateDropdown({
     Name = "Weapon",
     Options = {'Melee', 'Sword', 'Blox Fruit'},
@@ -1594,30 +1595,18 @@ task.spawn(function()
                         end
                     end
                 end
-            else
-                for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-                    if v.ToolTip == "Melee" then
-                        if game.Players.LocalPlayer.Backpack:FindFirstChild(tostring(v.Name)) then
-                            SelectWeapon = v.Name
-                        end
-                    end
-                end
             end
         end)
     end
 end)
 
+-- Toggle para auto farm
 local ToggleLevel = GeneralTab:CreateToggle({
-    Name = "Auto Farm (Broken)",
+    Name = "Auto Farm",
     CurrentValue = false,
     Flag = "AutoLevel",
     Callback = function(Value)
         _G.AutoLevel = Value
-        if Value == false then
-            wait()
-            toTarget(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame)
-            wait()
-        end
     end,
 })
 
@@ -1626,40 +1615,23 @@ spawn(function()
         if _G.AutoLevel then
             pcall(function()
                 CheckLevel()
-                if not string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text, NameMon) or game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Visible == false then
+                if not game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text:find(NameMon) or not game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Visible then
                     game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
                     toTarget(CFrameQ)
-                    if (CFrameQ.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5 then
+                    if (CFrameQ.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5 then
                         game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StartQuest", NameQuest, QuestLv)
                     end
-                elseif string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text, NameMon) or game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Visible == true then
+                else
                     for i, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
                         if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
                             if v.Name == Ms then
+                                EquipTool(SelectWeapon)
+                                toTarget(v.HumanoidRootPart.CFrame * CFrame.new(posX, posY, posZ))
                                 repeat
-                                    wait(_G.Fast_Delay)
-                                    AttackNoCoolDown()
-                                    bringmob = true
+                                    wait()
                                     AutoHaki()
-                                    EquipTool(SelectWeapon)
-                                    toTarget(v.HumanoidRootPart.CFrame * CFrame.new(posX, posY, posZ))
-                                    v.HumanoidRootPart.Size = Vector3.new(60, 60, 60)
-                                    v.HumanoidRootPart.Transparency = 1
-                                    v.Humanoid.JumpPower = 0
-                                    v.Humanoid.WalkSpeed = 0
-                                    v.HumanoidRootPart.CanCollide = false
-                                    FarmPos = v.HumanoidRootPart.CFrame
-                                    MonFarm = v.Name
-                                    --Click
-                                until not _G.AutoLevel or not v.Parent or v.Humanoid.Health <= 0 or not game:GetService("Workspace").Enemies:FindFirstChild(v.Name) or game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible == false
-                                bringmob = false
-                            end
-                        end
-                    end
-                    for i, v in pairs(game:GetService("Workspace")["_WorldOrigin"].EnemySpawns:GetChildren()) do
-                        if string.find(v.Name, NameMon) then
-                            if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Position).Magnitude >= 10 then
-                                toTarget(v.CFrame * CFrame.new(posX, posY, posZ))
+                                    AttackNoCoolDown()
+                                until not _G.AutoLevel or v.Humanoid.Health <= 0 or not v.Parent or not game:GetService("Workspace").Enemies:FindFirstChild(v.Name) or not game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible
                             end
                         end
                     end
@@ -1668,8 +1640,6 @@ spawn(function()
         end
     end
 end)
-
-
 
 -- Toggle para ativar/desativar o Mob Aura
 GeneralTab:CreateToggle({
@@ -3325,11 +3295,28 @@ spawn(function()
 end)
 
 MiscTab:CreateButton({
+    Name = "Remove Fog",
+        Callback = function()
+            NoFog()
+        end
+})
+
+function NoFog()
+    local c = game.Lighting
+    c.FogEnd = 100000
+    for r, v in pairs(c:GetDescendants()) do
+        if v:IsA("Atmosphere") then
+            v:Destroy()
+        end
+    end
+end
+
+MiscTab:CreateButton({
     Name = "Redeem All Code",
         Callback = function()
             UseCode()
         end
-    })
+})
 
     function UseCode(Text)
         game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer(Text)
